@@ -18,7 +18,7 @@ public class LockFreeBST
 	public final long lookup(long target)
 	{
 		Node node = grandParentHead;
-		while(node.lChild !=null) //loop until a leaf or dummy node is reached
+		while(node.lChild != null) //loop until a leaf or dummy node is reached
 		{
 			if(target < node.key)
 			{
@@ -53,7 +53,7 @@ public class LockFreeBST
 			nthChild=-1;
 			pnode = parentHead;
 			node = parentHead.lChild.getReference();
-			while(node.lChild !=null) //loop until a leaf or special node is reached
+			while(node.lChild != null) //loop until a leaf or dummy node is reached
 			{
 				if(insertKey < node.key)
 				{
@@ -88,15 +88,15 @@ public class LockFreeBST
 			Node internalNode, lLeafNode,rLeafNode;
 			if(node.key < insertKey)
 			{
-				lLeafNode = new Node(node.key, node.value, false);
-				rLeafNode = new Node(insertKey, insertValue, false);
-				internalNode = new Node(insertKey, insertValue, new AtomicStampedReference<Node>(lLeafNode,0),new AtomicStampedReference<Node>(rLeafNode,0));
+				//lLeafNode = new Node(node.key, node.value);
+				rLeafNode = new Node(insertKey, insertValue);
+				internalNode = new Node(insertKey, insertValue, new AtomicStampedReference<Node>(node,0),new AtomicStampedReference<Node>(rLeafNode,0));
 			}
 			else
 			{
-				lLeafNode = new Node(insertKey, insertValue, false);
-				rLeafNode =new Node(node.key, node.value, false);
-				internalNode = new Node(node.key, node.value, new AtomicStampedReference<Node>(lLeafNode,0),new AtomicStampedReference<Node>(rLeafNode,0));
+				lLeafNode = new Node(insertKey, insertValue);
+				//rLeafNode =new Node(node.key, node.value);
+				internalNode = new Node(node.key, node.value, new AtomicStampedReference<Node>(lLeafNode,0),new AtomicStampedReference<Node>(node,0));
 			}
 
 			if(nthChild ==0)
@@ -249,7 +249,6 @@ public class LockFreeBST
 		}
 		return stamp;
 	}
-
 	
 	public final boolean cleanUp(long key, SeekRecord s)
 	{
@@ -384,22 +383,8 @@ public class LockFreeBST
 		long key = Long.MAX_VALUE;
 		long value = Long.MAX_VALUE;
 
-		grandParentHead = new Node(key, value, true);
-		parentHead = new Node(key, value, true);
-		grandParentHead.lChild = new AtomicStampedReference<Node>(parentHead, 0);
-		parentHead.lChild = new AtomicStampedReference<Node>(new Node(key, value, true), 0);
+		parentHead = new Node(key, value, new AtomicStampedReference<Node>(new Node(key,value), 0),new AtomicStampedReference<Node>(new Node(key,value), 0));
+		grandParentHead = new Node(key, value, new AtomicStampedReference<Node>(parentHead, 0),new AtomicStampedReference<Node>(new Node(key,value), 0));
 	}
 	
 }
-
-
-
-
-
-
-
-
-
-
-
-
